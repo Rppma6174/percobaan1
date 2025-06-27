@@ -485,6 +485,10 @@
                 width: 100%;
                 height: 160px;
             }
+            .html {
+                margin-left: auto;
+                margin-right: auto;
+            }
         }
         .btn-quiz {
             background: linear-gradient(135deg, #ff6b35, #ff8c5a);
@@ -496,6 +500,84 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
         }
+        .fullscreen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 10000;
+    display: none;
+}
+
+.fullscreen-container.active {
+    display: block;
+}
+
+.fullscreen-video {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.fullscreen-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10001;
+}
+
+.fullscreen-btn {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+/* Update video player untuk tombol fullscreen */
+.video-player {
+    position: relative;
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-player:hover .video-controls {
+    opacity: 1;
+}
+
+/* Responsive fix untuk course completion notification */
+@media (max-width: 480px) {
+    .course-completion-modal {
+        width: 95% !important;
+        padding: 20px !important;
+        font-size: 14px !important;
+    }
+    
+    .course-completion-modal h3 {
+        font-size: 20px !important;
+    }
+    
+    .course-completion-modal .completion-icon {
+        font-size: 40px !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -526,6 +608,20 @@
             <div class="video-section">
                 <div class="video-player" id="videoPlayer">
                     <div class="video-loading">Klik video di sidebar untuk memulai</div>
+                    <div class="video-controls">
+                        <button class="fullscreen-btn" onclick="toggleFullscreen()" id="fullscreenToggle" style="display: none;">
+                            ⛶ Fullscreen
+                        </button>
+                    </div>
+                </div>
+
+<!-- Fullscreen container -->
+                <div class="fullscreen-container" id="fullscreenContainer">
+                    <div class="fullscreen-controls">
+                        <button class="fullscreen-btn" onclick="exitFullscreen()">
+                            ✕ Keluar Fullscreen
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="video-info">
@@ -595,7 +691,7 @@
     </div>
     
     <script>
-        const videoData = {
+const videoData = {
     'matematika-10': [
         {
             id: 'limit-dasar',
@@ -615,29 +711,30 @@
 let currentCourse = 'matematika-10';
 let currentVideoIndex = -1;
 let autoPlayTimer = null;
-let isFullscreen = false;
 
-// Fungsi untuk menyimpan progress (menggunakan variabel global instead of localStorage)
-let progressData = {};
-
+// Fungsi untuk menyimpan progress ke localStorage
 function saveProgress() {
     try {
-        progressData = {
+        const progressData = {
             courseProgress: videoData,
             currentCourse: currentCourse,
             currentVideoIndex: currentVideoIndex,
             lastUpdated: new Date().toISOString()
         };
+        localStorage.setItem('umt_video_progress', JSON.stringify(progressData));
         console.log('Progress saved successfully');
     } catch (error) {
         console.error('Error saving progress:', error);
     }
 }
 
-// Fungsi untuk memuat progress
+// Fungsi untuk memuat progress dari localStorage
 function loadProgress() {
     try {
-        if (progressData && Object.keys(progressData).length > 0) {
+        const saved = localStorage.getItem('umt_video_progress');
+        if (saved) {
+            const progressData = JSON.parse(saved);
+            
             // Merge saved data dengan videoData saat ini
             Object.keys(progressData.courseProgress).forEach(courseKey => {
                 if (videoData[courseKey]) {
@@ -672,15 +769,13 @@ function initializePage() {
     renderVideoList();
     updateProgress();
     resetVideoPlayer();
-    
-    // Add fullscreen event listeners
+
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 }
 
-// Handle fullscreen changes
 function handleFullscreenChange() {
     isFullscreen = !!(document.fullscreenElement || 
                      document.webkitFullscreenElement || 
@@ -699,7 +794,6 @@ function handleFullscreenChange() {
     }
 }
 
-// Toggle fullscreen
 function toggleFullscreen() {
     const videoContainer = document.getElementById('videoPlayer');
     
@@ -775,15 +869,15 @@ function selectVideo(index) {
     }
 }
 
-// Load video YouTube dengan kontrol fullscreen
+// Load video YouTube
 async function loadVideo(video) {
     const videoPlayer = document.getElementById('videoPlayer');
-    const embedUrl = `https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1&fs=1`;
+    const embedUrl = `https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&enablejsapi=1`;
     
     // Show loading
     videoPlayer.innerHTML = '<div class="video-loading">Memuat video...</div>';
     
-    // Load video dengan kontrol fullscreen
+    // Load video
     setTimeout(() => {
         videoPlayer.innerHTML = `
             <div class="video-wrapper" style="position: relative; width: 100%; height: 100%;">
@@ -1251,7 +1345,7 @@ function showCourseCompletionNotification() {
 // Fungsi reset progress (untuk debugging/testing)
 function resetProgress() {
     if (confirm('Apakah Anda yakin ingin menghapus semua progress pembelajaran?')) {
-        progressData = {};
+        localStorage.removeItem('umt_video_progress');
         location.reload();
     }
 }
@@ -1265,7 +1359,8 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// Add CSS animations dan fullscreen styles
+
+// Add CSS animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -1317,7 +1412,6 @@ style.textContent = `
     
     .video-wrapper:hover .video-controls {
         opacity: 1 !important;
-    }
 `;
 document.head.appendChild(style);
 
@@ -1372,6 +1466,36 @@ document.addEventListener('keydown', function(event) {
             if (prevIndex >= 0) {
                 selectVideo(prevIndex);
             }
+        }
+    }
+});
+
+// Handle keyboard shortcuts
+document.addEventListener('keydown', function(event) {
+    // Space atau Enter untuk mark complete
+    if ((event.code === 'Space' || event.code === 'Enter') && currentVideoIndex >= 0) {
+        const completeBtn = document.getElementById('completeBtn');
+        if (!completeBtn.disabled) {
+            event.preventDefault();
+            markAsComplete();
+        }
+    }
+    
+    // Arrow keys untuk navigasi
+    if (event.code === 'ArrowDown' || event.code === 'ArrowRight') {
+        event.preventDefault();
+        const videos = videoData[currentCourse] || [];
+        const nextIndex = currentVideoIndex + 1;
+        if (nextIndex < videos.length) {
+            selectVideo(nextIndex);
+        }
+    }
+    
+    if (event.code === 'ArrowUp' || event.code === 'ArrowLeft') {
+        event.preventDefault();
+        const prevIndex = currentVideoIndex - 1;
+        if (prevIndex >= 0) {
+            selectVideo(prevIndex);
         }
     }
 });
