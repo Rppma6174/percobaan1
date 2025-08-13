@@ -8,13 +8,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables for New Color Palette */
+        /* CSS Variables for Color Palette */
         :root {
-            --primary-color: #1a1a1a; /* Dark Charcoal */
-            --secondary-color: #ffffff; /* White */
-            --accent-color: #c5a47e;   /* Warm Gold/Bronze */
-            --bg-light: #f8f8f8;       /* Light Gray */
-            --text-muted: #6c757d;    /* Muted Gray Text */
+            --primary-color: #1a1a1a;
+            --secondary-color: #ffffff;
+            --accent-color: #c5a47e;
+            --bg-light: #f8f8f8;
+            --text-muted: #6c757d;
         }
 
         /* Basic Reset and Font */
@@ -22,6 +22,10 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -32,7 +36,7 @@
             overflow-x: hidden;
         }
 
-        /* Loading Screen (Unchanged) */
+        /* Loading Screen */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -44,13 +48,11 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            opacity: 1;
-            transition: all 1s ease-out;
+            transition: opacity 0.8s ease;
         }
 
         .loading-screen.fade-out {
             opacity: 0;
-            pointer-events: none;
         }
 
         .loader {
@@ -63,36 +65,46 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Navigation */
-/* Navigation */
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    padding: 20px 5%;
-    background: rgba(255,255,255,0.95);
-    z-index: 1000;
-    transition: all 0.3s ease;
-    transform: translateY(-100px);
-    opacity: 0;
-    visibility: hidden; /* <-- TAMBAHKAN BARIS INI */
-    border-bottom: 1px solid transparent;
-}
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(255, 255, 255, 0.85);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid transparent;
+            
+            /* Initial State for Animation */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1), 
+                        opacity 0.5s cubic-bezier(0.645, 0.045, 0.355, 1), 
+                        visibility 0s 0.5s;
+            will-change: transform, opacity;
+        }
+
+        nav.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition: transform 0.5s cubic-bezier(0.645, 0.045, 0.355, 1), 
+                        opacity 0.5s cubic-bezier(0.645, 0.045, 0.355, 1), 
+                        visibility 0s 0s;
+        }
         
         nav.scrolled {
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            border-bottom: 1px solid #eee;
+            background: rgba(255, 255, 255, 0.95);
         }
 
-nav.show {
-    transform: translateY(0);
-    opacity: 1;
-    visibility: visible; /* <-- TAMBAHKAN BARIS INI */
-}
         .nav-container {
             display: flex;
             justify-content: space-between;
@@ -117,7 +129,7 @@ nav.show {
             text-decoration: none;
             color: var(--primary-color);
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease;
             position: relative;
             padding-bottom: 5px;
         }
@@ -133,23 +145,20 @@ nav.show {
             transition: width 0.3s ease;
         }
 
-        .nav-links a:hover,
-        .nav-links a.active {
+        .nav-links a:hover, .nav-links a.active {
             color: var(--accent-color);
         }
 
-        .nav-links a:hover::after,
-        .nav-links a.active::after {
+        .nav-links a:hover::after, .nav-links a.active::after {
             width: 100%;
         }
 
-.menu-toggle {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    z-index: 1010; /* Tambahkan ini agar posisinya di atas menu */
-    position: relative; /* Diperlukan untuk transisi yang mulus */
-}
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            z-index: 1010;
+        }
 
         .menu-toggle span {
             width: 25px;
@@ -162,16 +171,17 @@ nav.show {
 
         /* Hero Section */
         .hero {
-            height: 100dvh;
+            height: 100dvh; /* Use dvh for modern mobile browsers */
+            height: 100vh; /* Fallback for older browsers */
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             position: relative;
-            overflow: hidden;
             background-image: url('https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
+            overflow: hidden;
         }
 
         .hero::before {
@@ -181,34 +191,37 @@ nav.show {
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1;
         }
 
         .hero-content {
             color: white;
             z-index: 2;
-            opacity: 0;
-            animation: fadeInUp 1.5s ease-out 0.5s forwards;
             padding: 0 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
+            will-change: opacity, transform;
+        }
+
+        .hero-content.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .hero h1 {
             font-size: 4.5rem;
             margin-bottom: 1rem;
             font-weight: 600;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .hero p {
             font-size: 1.3rem;
             margin-bottom: 2.5rem;
-            opacity: 0.9;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
-            font-weight: 300;
         }
 
         .cta-button {
@@ -229,17 +242,23 @@ nav.show {
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Section Styles */
+        /* General Section Styles */
         section {
             padding: 100px 5%;
             max-width: 1300px;
             margin: 0 auto;
+        }
+        
+        .animated-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            will-change: opacity, transform;
+        }
+        
+        .animated-element.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .section-title {
@@ -247,16 +266,8 @@ nav.show {
             font-weight: 600;
             text-align: center;
             margin-bottom: 3rem;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.6s ease;
         }
 
-        .section-title.animate {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
         .section-title::after {
             content: '';
             display: block;
@@ -273,31 +284,8 @@ nav.show {
             grid-template-columns: 1fr 1fr;
             gap: 4rem;
             align-items: center;
-            margin-top: 2rem;
         }
-
-        .about-text, .about-image {
-            opacity: 0;
-            transition: all 0.8s ease;
-        }
-        .about-text { transform: translateX(-50px); }
-        .about-image { transform: translateX(50px); transition-delay: 0.2s; }
-        .about-text.animate, .about-image.animate { opacity: 1; transform: translateX(0); }
-
-        .about-text h3 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .about-text p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-        }
-
+        .about-text, .about-image { will-change: opacity, transform; }
         .about-image img {
             width: 100%;
             height: 500px;
@@ -305,6 +293,8 @@ nav.show {
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.08);
         }
+        .about-text h3 { font-size: 2rem; }
+        .about-text p { color: var(--text-muted); }
 
         /* Portfolio Section */
         .portfolio-grid {
@@ -312,19 +302,13 @@ nav.show {
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2.5rem;
         }
-
         .portfolio-item {
             position: relative;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            transform: translateY(50px);
-            background: var(--bg-light);
         }
-
-        .portfolio-item.animate { opacity: 1; transform: translateY(0); }
         .portfolio-item:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.1); }
         .portfolio-item img {
             width: 100%;
@@ -333,7 +317,6 @@ nav.show {
             transition: transform 0.4s ease;
         }
         .portfolio-item:hover img { transform: scale(1.05); }
-
         .portfolio-overlay {
             position: absolute;
             bottom: 0;
@@ -341,33 +324,26 @@ nav.show {
             right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             padding: 4rem 1.5rem 1.5rem 1.5rem;
-            transition: all 0.3s ease;
         }
-        
         .portfolio-overlay h4, .portfolio-overlay p {
             color: white;
             transform: translateY(10px);
             opacity: 0;
             transition: all 0.4s ease;
         }
-        
         .portfolio-item:hover .portfolio-overlay h4,
         .portfolio-item:hover .portfolio-overlay p {
             transform: translateY(0);
             opacity: 1;
         }
-        
-        .portfolio-overlay h4 { font-size: 1.5rem; margin-bottom: 0.5rem; transition-delay: 0.1s; }
-        .portfolio-overlay p { font-size: 0.9rem; color: rgba(255,255,255,0.8); transition-delay: 0.2s; }
 
         /* Services Section */
-        .services { background: var(--bg-light); }
+        #services { background: var(--bg-light); }
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
         }
-
         .service-card {
             background: var(--secondary-color);
             padding: 2.5rem;
@@ -375,34 +351,20 @@ nav.show {
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
-            opacity: 0;
-            transform: translateY(30px);
         }
-
-        .service-card.animate { opacity: 1; transform: translateY(0); }
         .service-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
         .service-icon { font-size: 3rem; color: var(--accent-color); margin-bottom: 1.5rem; }
-        .service-card h4 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .service-card p { color: var(--text-muted); line-height: 1.6; }
 
         /* Contact Section */
         .contact-content {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             gap: 4rem;
-            margin-top: 2rem;
             background: white;
             padding: 3rem;
             border-radius: 15px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.07);
         }
-
-        .contact-info, .contact-form { opacity: 0; transition: all 0.8s ease; }
-        .contact-info { transform: translateX(-30px); }
-        .contact-form { transform: translateX(30px); transition-delay: 0.2s; }
-        .contact-info.animate, .contact-form.animate { opacity: 1; transform: translateX(0); }
-
-        .contact-info h3 { font-size: 2rem; margin-bottom: 2rem; color: var(--primary-color); }
         .contact-item { display: flex; align-items: center; margin-bottom: 2rem; }
         .contact-item i {
             width: 50px;
@@ -417,29 +379,22 @@ nav.show {
             font-size: 1.5rem;
             flex-shrink: 0;
         }
-        .contact-item h4 { font-size: 1.1rem; margin-bottom: 0.2rem; }
-        .contact-item p { color: var(--text-muted); }
-        
         .form-group { margin-bottom: 1.5rem; }
         .form-group input, .form-group textarea {
             width: 100%;
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 10px;
-            font-size: 1rem;
             font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
             background: var(--bg-light);
+            transition: all 0.3s ease;
         }
-
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--accent-color);
             background: var(--secondary-color);
             box-shadow: 0 0 0 3px rgba(197, 164, 126, 0.2);
         }
-
-        .form-group textarea { height: 120px; resize: vertical; }
         .submit-btn {
             background: var(--primary-color);
             color: white;
@@ -447,16 +402,9 @@ nav.show {
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
             transition: all 0.3s ease;
         }
-
-        .submit-btn:hover {
-            background: var(--accent-color);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
+        .submit-btn:hover { background: var(--accent-color); }
 
         /* Footer */
         footer {
@@ -465,8 +413,6 @@ nav.show {
             text-align: center;
             padding: 4rem 5%;
         }
-
-        .footer-content { max-width: 1200px; margin: 0 auto; }
         .social-links { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
         .social-links a {
             width: 50px;
@@ -481,11 +427,7 @@ nav.show {
             transition: all 0.3s ease;
             font-size: 1.5rem;
         }
-
         .social-links a:hover { background: var(--accent-color); transform: translateY(-3px); }
-        .footer-content p { margin-bottom: 0.5rem; }
-        .footer-content p:last-child { opacity: 0.5; font-size: 0.9rem; }
-
 
         /* Scroll to Top Button */
         .scroll-top {
@@ -500,6 +442,7 @@ nav.show {
             border-radius: 50%;
             cursor: pointer;
             opacity: 0;
+            visibility: hidden;
             transform: translateY(100px);
             transition: all 0.4s ease;
             z-index: 1000;
@@ -508,76 +451,58 @@ nav.show {
             align-items: center;
             justify-content: center;
         }
-
-        .scroll-top.show { opacity: 1; transform: translateY(0); }
-        .scroll-top:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(197, 164, 126, 0.4); }
+        .scroll-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
         /* Responsive Design */
         @media (max-width: 992px) {
             .about-content, .contact-content { grid-template-columns: 1fr; }
-            .about-image { order: -1; }
         }
         @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
+            .hero p { font-size: 1.1rem; }
+            .section-title { font-size: 2.2rem; }
+            .contact-content { padding: 2rem; }
+            
             .menu-toggle { display: flex; }
             .nav-links {
                 position: fixed;
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 100vh;
+                height: 100%;
                 background: var(--secondary-color);
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
+                z-index: 1005;
                 transform: translateX(100%);
                 transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
-                z-index: 1000; /* Tambahkan z-index ini */
             }
             .nav-links.active { transform: translateX(0); }
-            
-.menu-toggle.active span {
-    background: var(--primary-color); /* Pastikan warna X terlihat jelas */
-}
-
-.menu-toggle.active span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-.menu-toggle.active span:nth-child(2) {
-    opacity: 0;
-}
-.menu-toggle.active span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}
-
-            .hero h1 { font-size: 2.5rem; }
-            .hero p { font-size: 1.1rem; }
-            .section-title { font-size: 2.2rem; }
-            section { padding: 80px 5%; }
-            .contact-content { padding: 2rem; }
-            .portfolio-grid { grid-template-columns: 1fr; }
-            .services-grid { grid-template-columns: 1fr; }
+            .menu-toggle.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+            .menu-toggle.active span:nth-child(2) { opacity: 0; }
+            .menu-toggle.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
         }
     </style>
 </head>
 <body>
+
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
     </div>
 
     <nav id="navbar">
         <div class="nav-container">
-            <div class="logo">ARYA STUDIO</div>
+            <a href="#home" class="logo">ARYA STUDIO</a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#home" class="nav-link">Home</a></li>
                 <li><a href="#about" class="nav-link">Tentang</a></li>
                 <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
                 <li><a href="#services" class="nav-link">Layanan</a></li>
                 <li><a href="#contact" class="nav-link">Kontak</a></li>
             </ul>
             <div class="menu-toggle" id="menuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </div>
         </div>
     </nav>
@@ -590,275 +515,178 @@ nav.show {
         </div>
     </section>
 
-    <section id="about">
-        <h2 class="section-title">Tentang Kami</h2>
-        <div class="about-content">
-            <div class="about-text">
-                <h3>Visi & Misi Kami</h3>
-                <p>Kami percaya bahwa arsitektur yang baik tidak hanya tentang estetika, tetapi juga tentang menciptakan ruang yang bermakna dan berkelanjutan. Dengan pengalaman lebih dari 10 tahun, kami telah merancang berbagai proyek mulai dari hunian pribadi hingga bangunan komersial.</p>
-                <p>Pendekatan kami selalu dimulai dengan memahami kebutuhan klien, kondisi lingkungan, dan tantangan yang ada. Setiap desain yang kami ciptakan adalah solusi unik yang mencerminkan karakter dan kebutuhan spesifik setiap proyek.</p>
+    <main>
+        <section id="about" class="animated-element">
+            <h2 class="section-title">Tentang Kami</h2>
+            <div class="about-content">
+                <div class="about-text animated-element">
+                    <h3>Visi & Misi Kami</h3>
+                    <p>Kami percaya bahwa arsitektur yang baik tidak hanya tentang estetika, tetapi juga tentang menciptakan ruang yang bermakna dan berkelanjutan. Dengan pengalaman lebih dari 10 tahun, kami telah merancang berbagai proyek.</p>
+                </div>
+                <div class="about-image animated-element">
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop" alt="Architect sketching on a blueprint">
+                </div>
             </div>
-            <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop" alt="Architect sketching on a blueprint">
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="portfolio">
-        <h2 class="section-title">Portfolio Unggulan</h2>
-        <div class="portfolio-grid">
-            <div class="portfolio-item">
-                <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" alt="Modern Villa">
-                <div class="portfolio-overlay">
-                    <h4>Villa Modern Minimalis</h4>
-                    <p>Desain villa dengan konsep open space dan pencahayaan alami maksimal.</p>
+        <section id="portfolio" class="animated-element">
+            <h2 class="section-title">Portfolio Unggulan</h2>
+            <div class="portfolio-grid">
+                <div class="portfolio-item animated-element">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=2070&auto=format&fit=crop" alt="Modern Villa"><div class="portfolio-overlay"><h4>Villa Modern Minimalis</h4><p>Desain villa dengan konsep open space dan pencahayaan alami maksimal.</p></div>
+                </div>
+                <div class="portfolio-item animated-element">
+                    <img src="https://images.unsplash.com/photo-1593349480503-64d4a6c42173?q=80&w=1964&auto=format&fit=crop" alt="Office Building Interior"><div class="portfolio-overlay"><h4>Interior Kantor Korporat</h4><p>Arsitektur komersial dengan efisiensi energi dan kenyamanan kerja optimal.</p></div>
+                </div>
+                <div class="portfolio-item animated-element">
+                    <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2070&auto=format&fit=crop" alt="Residential Complex"><div class="portfolio-overlay"><h4>Komplek Hunian Asri</h4><p>Perumahan modern dengan konsep sustainable living dan community space.</p></div>
+                </div>
+                <div class="portfolio-item animated-element">
+                    <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=2070&auto=format&fit=crop" alt="Luxury Home at Night"><div class="portfolio-overlay"><h4>Rumah Mewah Tropis</h4><p>Desain yang memadukan kemewahan dengan elemen tropis kontemporer.</p></div>
                 </div>
             </div>
-            <div class="portfolio-item">
-                <img src="https://images.unsplash.com/photo-1593349480503-64d4a6c42173?q=80&w=1964&auto=format&fit=crop" alt="Office Building Interior">
-                <div class="portfolio-overlay">
-                    <h4>Interior Kantor Korporat</h4>
-                    <p>Arsitektur komersial dengan efisiensi energi dan kenyamanan kerja optimal.</p>
-                </div>
-            </div>
-            <div class="portfolio-item">
-                <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2070&auto=format&fit=crop" alt="Residential Complex">
-                <div class="portfolio-overlay">
-                    <h4>Komplek Hunian Asri</h4>
-                    <p>Perumahan modern dengan konsep sustainable living dan community space.</p>
-                </div>
-            </div>
-            <div class="portfolio-item">
-                <img src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=2070&auto=format&fit=crop" alt="Luxury Home at Night">
-                <div class="portfolio-overlay">
-                    <h4>Rumah Mewah Tropis</h4>
-                    <p>Desain bangunan publik yang memadukan nilai tradisional dengan arsitektur kontemporer.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="services" id="services">
-        <h2 class="section-title">Layanan Kami</h2>
-        <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon">🏗️</div>
-                <h4>Desain Arsitektur</h4>
-                <p>Merancang bangunan residensial dan komersial dari konsep hingga detail konstruksi.</p>
+        <section id="services" class="services animated-element">
+            <h2 class="section-title">Layanan Kami</h2>
+            <div class="services-grid">
+                <div class="service-card animated-element"><div class="service-icon">🏗️</div><h4>Desain Arsitektur</h4><p>Merancang bangunan residensial dan komersial dari konsep hingga detail.</p></div>
+                <div class="service-card animated-element"><div class="service-icon">📐</div><h4>Perencanaan Urban</h4><p>Mengembangkan masterplan untuk kawasan urban yang mempertimbangkan aspek sosial.</p></div>
+                <div class="service-card animated-element"><div class="service-icon">🏠</div><h4>Desain Interior</h4><p>Menciptakan interior yang fungsional dan estetis sesuai karakter penghuninya.</p></div>
             </div>
-            <div class="service-card">
-                <div class="service-icon">📐</div>
-                <h4>Perencanaan Urban</h4>
-                <p>Mengembangkan masterplan untuk kawasan urban yang mempertimbangkan aspek sosial dan lingkungan.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">🌱</div>
-                <h4>Arsitektur Hijau</h4>
-                <p>Menerapkan prinsip green building untuk menciptakan bangunan ramah lingkungan dan efisien.</p>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">🏠</div>
-                <h4>Desain Interior</h4>
-                <p>Menciptakan interior yang fungsional dan estetis sesuai dengan karakter penghuninya.</p>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <section id="contact">
-        <h2 class="section-title">Hubungi Kami</h2>
-        <div class="contact-content">
-            <div class="contact-info">
-                <h3>Mari Wujudkan Ide Anda</h3>
-                <div class="contact-item">
-                    <i>📍</i>
-                    <div>
-                        <h4>Alamat Studio</h4>
-                        <p>Jl. Jenderal Sudirman No. 123, Manado, Indonesia</p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <i>📞</i>
-                    <div>
-                        <h4>Telepon</h4>
-                        <p>+62 812 3456 7890</p>
-                    </div>
-                </div>
-                <div class="contact-item">
-                    <i>✉️</i>
-                    <div>
-                        <h4>Email</h4>
-                        <p>info@aryastudio.id</p>
-                    </div>
-                </div>
+        <section id="contact" class="animated-element">
+            <h2 class="section-title">Hubungi Kami</h2>
+            <div class="contact-content">
+                <div class="contact-info animated-element"><h3>Mari Wujudkan Ide Anda</h3><div class="contact-item"><i>📍</i><div><h4>Alamat Studio</h4><p>Jl. Jenderal Sudirman No. 123, Manado, Indonesia</p></div></div><div class="contact-item"><i>📞</i><div><h4>Telepon</h4><p>+62 812 3456 7890</p></div></div><div class="contact-item"><i>✉️</i><div><h4>Email</h4><p>info@aryastudio.id</p></div></div></div>
+                <form class="contact-form animated-element"><div class="form-group"><input type="text" placeholder="Nama Lengkap Anda" required></div><div class="form-group"><input type="email" placeholder="Alamat Email" required></div><div class="form-group"><textarea placeholder="Ceritakan tentang proyek impian Anda..." required></textarea></div><button type="submit" class="submit-btn">Kirim Pesan</button></form>
             </div>
-            <form class="contact-form">
-                <div class="form-group"><input type="text" placeholder="Nama Lengkap Anda" required></div>
-                <div class="form-group"><input type="email" placeholder="Alamat Email" required></div>
-                <div class="form-group"><textarea placeholder="Ceritakan tentang proyek impian Anda..." required></textarea></div>
-                <button type="submit" class="submit-btn">Kirim Pesan</button>
-            </form>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-content">
-            <div class="social-links">
-                <a href="#" aria-label="Instagram">📷</a>
-                <a href="#" aria-label="Facebook">👥</a>
-                <a href="#" aria-label="LinkedIn">💼</a>
-            </div>
-            <p>&copy; 2025 ARYA STUDIO. Seluruh hak cipta dilindungi.</p>
-            <p>Menciptakan Ruang yang Menginspirasi Kehidupan</p>
-        </div>
-    </footer>
+        </section>
+    </main>
+    
+    <footer><div class="footer-content"><div class="social-links"><a href="#" aria-label="Instagram">📷</a><a href="#" aria-label="Facebook">👥</a><a href="#" aria-label="LinkedIn">💼</a></div><p>&copy; 2025 ARYA STUDIO. All rights reserved.</p></div></footer>
 
     <button class="scroll-top" id="scrollTop">↑</button>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // All JS code will run after the document is loaded
-            const loadingScreen = document.getElementById('loadingScreen');
-            const navbar = document.getElementById('navbar');
-            const menuToggle = document.getElementById('menuToggle');
-            const navLinks = document.getElementById('navLinks');
-            const navLinksArray = document.querySelectorAll('.nav-link');
-            const ctaButton = document.querySelector('.cta-button');
-            const scrollTopBtn = document.getElementById('scrollTop');
-            const contactForm = document.querySelector('.contact-form');
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Element Selectors ---
+        const loadingScreen = document.getElementById('loadingScreen');
+        const navbar = document.getElementById('navbar');
+        const heroContent = document.querySelector('.hero-content');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const navLinkItems = document.querySelectorAll('.nav-link');
+        const scrollTopBtn = document.getElementById('scrollTop');
 
-            // --- Loading Screen ---
-            window.addEventListener('load', function() {
-                setTimeout(() => {
-                    loadingScreen.classList.add('fade-out');
-                    setTimeout(() => {
-                        loadingScreen.style.display = 'none';
-                        navbar.classList.add('show');
-                    }, 500);
-                }, 500);
-            });
-
-            // --- Mobile Menu ---
-            menuToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('active');
-                menuToggle.classList.toggle('active');
-            });
+        // --- STAGE 1: Handle Page Load & Initial Animations ---
+        window.addEventListener('load', () => {
+            // A. Start fading out loading screen
+            loadingScreen.classList.add('fade-out');
             
-            // --- Navbar Style & Active Link on Scroll ---
-            const sections = document.querySelectorAll('section');
-            window.addEventListener('scroll', function() {
-                // Navbar style
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-                
-                // Scroll Top button
-                if (window.pageYOffset > 300) {
-                    scrollTopBtn.classList.add('show');
-                } else {
-                    scrollTopBtn.classList.remove('show');
-                }
-                
-                // Active link
-                let current = '';
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 85) {
-                        current = section.getAttribute('id');
-                    }
-                });
+            // B. After loading screen is mostly gone, show Navbar and Hero content
+            setTimeout(() => {
+                navbar.classList.add('show');
+                heroContent.classList.add('visible');
+            }, 400); // Should be slightly less than loading screen transition
 
-                navLinksArray.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href').includes(current)) {
-                        link.classList.add('active');
-                    }
-                });
-            });
+            // C. After loading screen is completely gone, remove it from DOM
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 800); // Matches loading screen transition
 
-            // --- Smooth Scrolling ---
-            function smoothScroll(targetId) {
-                const targetSection = document.querySelector(targetId);
-                if (targetSection) {
-                    const offsetTop = targetSection.offsetTop - 80;
-                    window.scrollTo({
-                        top: offsetTop,
-                        behavior: 'smooth'
+            // --- STAGE 2: Initialize Heavy Scroll Animations After a Delay ---
+            // This gives the browser breathing room to render the initial view perfectly.
+            setTimeout(() => {
+                initializeScrollAnimations();
+            }, 1000); // 1-second delay after page is fully loaded
+        });
+
+        // --- Function to Setup Scroll Animations ---
+        function initializeScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animated-element');
+            
+            if ("IntersectionObserver" in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const el = entry.target;
+                            // Add staggered delay for child elements
+                            const childElements = el.querySelectorAll('.animated-element');
+                            if(childElements.length > 0) {
+                                childElements.forEach((child, index) => {
+                                    child.style.transitionDelay = `${index * 100}ms`;
+                                });
+                            }
+                            el.classList.add('is-visible');
+                            observer.unobserve(el);
+                        }
                     });
-                }
+                }, { threshold: 0.1 });
+
+                animatedElements.forEach(el => observer.observe(el));
+            } else {
+                // Fallback for older browsers
+                animatedElements.forEach(el => el.classList.add('is-visible'));
+            }
+        }
+
+        // --- Navbar & Scroll-to-Top Button Logic on Scroll ---
+        window.addEventListener('scroll', () => {
+            // Style navbar on scroll
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
 
-            navLinksArray.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (navLinks.classList.contains('active')) {
-                        navLinks.classList.remove('active');
-                        menuToggle.classList.remove('active');
-                    }
-                    smoothScroll(this.getAttribute('href'));
-                });
-            });
+            // Show/hide scroll-to-top button
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
 
-            ctaButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                smoothScroll(this.getAttribute('href'));
-            });
-
-            scrollTopBtn.addEventListener('click', function() {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-            
-            // --- Scroll Animations ---
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-
-            const observer = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const target = entry.target;
-                        const delay = target.dataset.delay || 0;
-                        setTimeout(() => {
-                           target.classList.add('animate');
-                        }, delay);
-                        observer.unobserve(target);
-                    }
-                });
-            }, observerOptions);
-
-            const animatedElements = document.querySelectorAll('.section-title, .about-text, .about-image, .portfolio-item, .service-card, .contact-info, .contact-form');
-            
-            animatedElements.forEach((el, index) => {
-                // Stagger animations for grid items
-                if (el.classList.contains('portfolio-item') || el.classList.contains('service-card')) {
-                    el.dataset.delay = (index % 4) * 150;
+            // Update active nav link
+            let currentSection = '';
+            document.querySelectorAll('section[id]').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    currentSection = section.getAttribute('id');
                 }
-                observer.observe(el);
             });
 
-            // --- Form Submission Simulation ---
-            contactForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const submitBtn = this.querySelector('.submit-btn');
-                const originalText = submitBtn.textContent;
+            navLinkItems.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        }, { passive: true }); // Use passive listener for better scroll performance
 
-                submitBtn.textContent = 'Mengirim...';
-                submitBtn.disabled = true;
+        // --- Mobile Menu Toggle ---
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        });
 
-                setTimeout(() => {
-                    submitBtn.textContent = 'Pesan Terkirim ✓';
-                    submitBtn.style.background = '#28a745';
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
-                        submitBtn.style.background = '';
-                        this.reset();
-                    }, 2000);
-                }, 1500);
+        // Close mobile menu when a link is clicked
+        navLinkItems.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
             });
         });
+
+        // --- Scroll-to-Top Button Action ---
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+    });
     </script>
 </body>
 </html>
