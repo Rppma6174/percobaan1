@@ -68,30 +68,32 @@
         }
 
         /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 5%;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            transform: translateY(-100px);
-            opacity: 0;
-            border-bottom: 1px solid transparent;
-        }
+/* Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 20px 5%;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    transform: translateY(-100px);
+    opacity: 0;
+    visibility: hidden; /* <-- TAMBAHKAN BARIS INI */
+    border-bottom: 1px solid transparent;
+}
         
         nav.scrolled {
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             border-bottom: 1px solid #eee;
         }
 
-        nav.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
+nav.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible; /* <-- TAMBAHKAN BARIS INI */
+}
         .nav-container {
             display: flex;
             justify-content: space-between;
